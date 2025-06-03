@@ -1,7 +1,8 @@
 package assert
 
 import (
-	"log"
+	. "fmt"
+	"reflect"
 )
 
 func Must[T any](v T, e error) T {
@@ -13,58 +14,15 @@ func Must[T any](v T, e error) T {
 }
 
 func Assert(i any) {
-	die := func(v any) { log.Panicf("Assertion failed for type %T, %v", i, v) }
+	var v reflect.Value = reflect.ValueOf(i)
+	if v.Kind() == reflect.Struct {
+		panic(Errorf("Cannot Assert on struct type %T: %v\n", i, i))
+	}
 
-	switch v := i.(type) {
-	case nil:
-		die(nil)
-	case int:
-		if v == 0 {
-			die(v)
-		}
-	case uint:
-		if v == 0 {
-			die(v)
-		}
-	case float32:
-		if v == 0.0 {
-			die(v)
-		}
-	case float64:
-		if v == 0.0 {
-			die(v)
-		}
-	case bool:
-		if !v {
-			die(v)
-		}
-	case string:
-		if v == "" {
-			die(v)
-		}
-	case *int:
-		if *v == 0 {
-			die(*v)
-		}
-	case *uint:
-		if *v == 0 {
-			die(*v)
-		}
-	case *float32:
-		if *v == 0.0 {
-			die(*v)
-		}
-	case *float64:
-		if *v == 0.0 {
-			die(*v)
-		}
-	case *bool:
-		if !*v {
-			die(*v)
-		}
-	case *string:
-		if *v == "" {
-			die(*v)
-		}
+	// Indirect returns the value that v points to. If v is a nil pointer,
+	// Indirect returns a zero Value, otherwise, Indirect returns v.
+	var iv reflect.Value = reflect.Indirect(v)
+	if iv.IsZero() {
+		panic(Errorf("Zero value of type %T: %v\n", i, iv))
 	}
 }

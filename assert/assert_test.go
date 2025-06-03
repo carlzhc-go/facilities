@@ -31,7 +31,24 @@ func TestMust(t *tt.T) {
 func expectAssertPanic(t *tt.T, i any) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf("Failed test on %T %v", i, i)
+			t.Errorf("Failed test on (%T)%v", i, i)
+		} else {
+			t.Logf("Passed panic test on (%T)%v", i, i)
+		}
+	}()
+
+	switch v := i.(type) {
+	default:
+		Assert(v)
+	}
+}
+
+func expectAssertPass(t *tt.T, i any) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Logf("Passed test on (%T)%v", i, i)
+		} else {
+			t.Errorf("Failed test on (%T)%v", i, i)
 		}
 	}()
 
@@ -43,24 +60,44 @@ func expectAssertPanic(t *tt.T, i any) {
 
 func TestAssert(t *tt.T) {
 	i := 0
-	Assert(1)
+	expectAssertPass(t, 1)
 	expectAssertPanic(t, i)
 	expectAssertPanic(t, &i)
-	Assert(0.1)
+	expectAssertPass(t, 0.1)
 	expectAssertPanic(t, 0.0)
-	Assert("hello")
+	expectAssertPass(t, "hello")
 	expectAssertPanic(t, "")
-	Assert(true)
+	expectAssertPass(t, true)
 	expectAssertPanic(t, false)
 	expectAssertPanic(t, nil)
 
 	b := true
-	Assert(&b)
+	expectAssertPass(t, &b)
 	b = !b
 	expectAssertPanic(t, &b)
 
 	var o struct{}
-	Assert(o)
+	expectAssertPanic(t, o)
+	expectAssertPanic(t, &o)
 
-	Assert(&o)
+	var s []byte
+	expectAssertPanic(t, s)
+	expectAssertPanic(t, &s)
+
+	var m map[any]any
+	expectAssertPanic(t, m)
+	expectAssertPanic(t, &m)
+
+	m = make(map[any]any)
+	expectAssertPass(t, m)
+	expectAssertPass(t, &m)
+
+	var c chan int
+	expectAssertPanic(t, c)
+	expectAssertPanic(t, &c)
+
+	c = make(chan int)
+	expectAssertPass(t, c)
+	expectAssertPass(t, &c)
+
 }
