@@ -44,14 +44,23 @@ func TestPerlPackage(t *testing.T) {
 func TestPerlSubst(t *testing.T) {
 	samples := [][]string{
 		// subject, pattern, replacement, flags, expectation
-		[]string{"abc abc", "a", "x", "g", "xbc xbc"},
+		{"abcabc", "a", "x", "", "xbcabc"},
+		{"abcabc", "a", "x", "g", "xbcxbc"},
+		{"abcAbc", "A", "x", "i", "xbcAbc"},
+		{"abcAbc", "A", "x", "ig", "xbcxbc"},
+		{"abcAbc", "a.*b", "x", "ig", "xc"},
+		{"abcAbc", "a.*b", "x", "?", "xcAbc"},
+		{"abc\nAbc", "a.*b", "x", "ig", "xc\nxc"},
+		{"abc\nAbc", "a.*b", "x", "igs", "xc"},
 	}
 
 	for _, s := range samples {
-		if S(s[0], s[1], s[2], s[3]) == s[4] {
-			t.Logf(`Passed test %v => %v`, s[0:3], s[4])
+		got := S(s[0], s[1], s[2], s[3])
+		exp := s[4]
+		if got == exp {
+			t.Logf(`Passed test %v => %v`, s[0:4], got)
 		} else {
-			t.Errorf(`Failed test %v => %v`, s[0:3], s[4])
+			t.Errorf(`Failed test %v => %v, got %v`, s[0:4], s[4], got)
 		}
 	}
 }
