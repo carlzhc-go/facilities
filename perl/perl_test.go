@@ -1,6 +1,7 @@
 package perl
 
 import "testing"
+
 // import "os"
 import "strings"
 import "bytes"
@@ -10,7 +11,7 @@ func TestPerlPackage(t *testing.T) {
 	msg := "Test perl function"
 	wb := bytes.NewBuffer(nil)
 
-	check := func (fn, exp string) {
+	check := func(fn, exp string) {
 		got := strings.TrimSpace(wb.String())
 		if got == exp {
 			t.Logf(`Passed testing %s, [%d]"%v"`, fn, len(exp), exp)
@@ -38,4 +39,19 @@ func TestPerlPackage(t *testing.T) {
 		}()
 		p.Die(msg)
 	}()
+}
+
+func TestPerlSubst(t *testing.T) {
+	samples := [][]string{
+		// subject, pattern, replacement, flags, expectation
+		[]string{"abc abc", "a", "x", "g", "xbc xbc"},
+	}
+
+	for _, s := range samples {
+		if S(s[0], s[1], s[2], s[3]) == s[4] {
+			t.Logf(`Passed test %v => %v`, s[0:3], s[4])
+		} else {
+			t.Errorf(`Failed test %v => %v`, s[0:3], s[4])
+		}
+	}
 }
