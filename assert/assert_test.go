@@ -77,7 +77,7 @@ func TestAssert(t *tt.T) {
 	expectAssertPanic(t, &b)
 
 	var o struct{}
-	expectAssertPanic(t, o)
+	expectAssertPass(t, o)
 	expectAssertPanic(t, &o)
 
 	var s []byte

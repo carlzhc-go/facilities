@@ -16,7 +16,8 @@ func Must[T any](v T, e error) T {
 func Assert(i any) {
 	var v reflect.Value = reflect.ValueOf(i)
 	if v.Kind() == reflect.Struct {
-		panic(Errorf("Cannot Assert on struct type %T: %v\n", i, i))
+		return // Ignore stuct type
+		// panic(Errorf("Cannot Assert on struct type %T: %v\n", i, i))
 	}
 
 	// Indirect returns the value that v points to. If v is a nil pointer,
