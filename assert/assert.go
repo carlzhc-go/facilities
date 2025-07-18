@@ -13,15 +13,13 @@ func Must[T any](v T, e error) T {
 	return v
 }
 
+// Assert will panic if the argument is zero or it's pointing to zero
 func Assert(i any) {
-	var v reflect.Value = reflect.ValueOf(i)
-	if v.Kind() == reflect.Struct {
-		return // Ignore stuct type
-		// panic(Errorf("Cannot Assert on struct type %T: %v\n", i, i))
+	var v = reflect.ValueOf(i)
+	if v.IsZero() {
+		panic(Errorf("Zero value of type %T: %v\n", v, v))
 	}
 
-	// Indirect returns the value that v points to. If v is a nil pointer,
-	// Indirect returns a zero Value, otherwise, Indirect returns v.
 	var iv reflect.Value = reflect.Indirect(v)
 	if iv.IsZero() {
 		panic(Errorf("Zero value of type %T: %v\n", i, iv))

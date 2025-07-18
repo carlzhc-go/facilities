@@ -31,7 +31,7 @@ func TestMust(t *tt.T) {
 func expectAssertPanic(t *tt.T, i any) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf("Failed test on (%T)%v", i, i)
+			t.Errorf("!! Failed panic test on (%T)%v", i, i)
 		} else {
 			t.Logf("Passed panic test on (%T)%v", i, i)
 		}
@@ -77,7 +77,15 @@ func TestAssert(t *tt.T) {
 	expectAssertPanic(t, &b)
 
 	var o struct{}
-	expectAssertPass(t, o)
+	expectAssertPanic(t, o)
+	expectAssertPanic(t, &o)
+
+	var oi = struct{i int}{1}
+	expectAssertPass(t, oi)
+	expectAssertPass(t, &oi)
+
+	oi.i = 0
+	expectAssertPanic(t, o)
 	expectAssertPanic(t, &o)
 
 	var s []byte
